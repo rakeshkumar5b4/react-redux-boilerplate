@@ -1,5 +1,5 @@
 import * as types from './actionTypes';
-import courseAPI from '../api/mockCourseAPI'
+import courseAPI from '../api/mockCourseAPI';
 
 export function createCourse(course) {
     return { type : types.CREATE_COURSE, course};
@@ -17,7 +17,7 @@ export function loadCourses() {
         return courseAPI.getAllCourses().then(courses  => {
             dispatch(loadCoursesSuccess(courses));
         }).catch(err => {
-            throw(err)
+            throw(err);
         });
     };
 }
