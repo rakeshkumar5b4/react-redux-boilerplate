@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import * as courseActions from '../../actions/courseActions';
 import {bindActionCreators} from 'redux';
 import CourseForm from './CourseForm';
+import {browserHistory} from 'react-router';
 
 class ManageCoursePage extends React.Component {
 
@@ -10,15 +11,35 @@ class ManageCoursePage extends React.Component {
         super(props, context);
 
         this.state = {
-            course : Object.assign({}, props.course),
+            course: Object.assign({}, props.course),
             errors: {}
         };
+        this.updateCourseState = this.updateCourseState.bind(this);
+        this.saveCourse = this.saveCourse.bind(this);
+    }
+
+    updateCourseState(event) {
+        const field = event.target.name;
+        let course = this.state.course;
+        course[field] = event.target.value;
+        this.setState({course});
+    }
+
+    saveCourse(event) {
+        event.preventDefault();
+        this.props.actions.saveCourse(this.state.course);
+        browserHistory.push('/courses');
     }
 
     render() {
         return (
             <div>
-                <CourseForm course={this.state.course} errors={this.state.errors} allAuthors={this.props.authors} />
+                <CourseForm
+                    course={this.state.course}
+                    errors={this.state.errors}
+                    onChange={this.updateCourseState}
+                    onSave={this.saveCourse}
+                    allAuthors={this.props.authors}/>
             </div>
         );
     }
@@ -26,8 +47,9 @@ class ManageCoursePage extends React.Component {
 }
 
 ManageCoursePage.propTypes = {
-    course : PropTypes.object.isRequired,    
-    authors : PropTypes.array.isRequired
+    course: PropTypes.object.isRequired,
+    authors: PropTypes.array.isRequired,
+    actions: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
@@ -39,17 +61,16 @@ function mapStateToProps(state, ownProps) {
         length: '',
         category: ''
     };
-    const authorsFormattedForDropdown = state.authors.map(author => {
-        return {
-            value : author.id,
-            text : author.firstName + ' ' + author.lastName
-        };
-    });
+    const authorsFormattedForDropdown = state
+        .authors
+        .map(author => {
+            return {
+                value: author.id,
+                text: author.firstName + ' ' + author.lastName
+            };
+        });
 
-    return {
-        course: course,
-        authors : authorsFormattedForDropdown
-    };
+    return {course: course, authors: authorsFormattedForDropdown};
 }
 
 function mapDispatcherToProps(dispatch) {
